@@ -127,32 +127,38 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 12,
+    minHeight: 60,
   },
   userInfo: {
     marginLeft: 12,
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    paddingTop: 2,
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     flexWrap: "wrap",
+    minHeight: 28,
   },
   userName: {
     fontWeight: "bold",
     flexShrink: 1,
+    maxWidth: "60%",
   },
   levelChip: {
-    height: 26,
-    paddingHorizontal: 4,
+    height: 28,
+    minWidth: 50,
+    paddingHorizontal: 8,
   },
   levelText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "bold",
     color: "#4CAF50",
+    lineHeight: 16,
   },
   timestamp: {
     opacity: 0.6,

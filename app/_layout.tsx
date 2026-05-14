@@ -8,38 +8,46 @@ import { StatusBar } from "expo-status-bar";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 
+import { AuthProvider } from "@/contexts/AuthContext";
 import { CommunityProvider } from "@/contexts/CommunityContext";
 import { EcoProvider } from "@/contexts/EcoContext";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <PaperProvider>
-      <EcoProvider>
-        <CommunityProvider>
-          <ProfileProvider>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="modal"
-                  options={{ presentation: "modal", title: "Modal" }}
-                />
-              </Stack>
-              <StatusBar style="auto" />
-            </ThemeProvider>
-          </ProfileProvider>
-        </CommunityProvider>
-      </EcoProvider>
+      <AuthProvider>
+        <EcoProvider>
+          <CommunityProvider>
+            <ProfileProvider>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="register"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="modal"
+                    options={{ presentation: "modal", title: "Modal" }}
+                  />
+                </Stack>
+                <StatusBar style="auto" />
+              </ThemeProvider>
+            </ProfileProvider>
+          </CommunityProvider>
+        </EcoProvider>
+      </AuthProvider>
     </PaperProvider>
   );
 }

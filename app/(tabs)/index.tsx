@@ -2,6 +2,7 @@ import { EcoTipCard } from "@/components/eco/EcoTipCard";
 import { StatCard } from "@/components/eco/StatCard";
 import { WeeklyChart } from "@/components/eco/WeeklyChart";
 import { EcoTheme } from "@/constants/theme";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEco } from "@/contexts/EcoContext";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -9,9 +10,10 @@ import { Card, Text } from "react-native-paper";
 
 export default function HomeScreen() {
   const { userStats, weeklyProgress, tasks } = useEco();
+  const { user } = useAuth();
 
   const completedToday = tasks.filter((t) => t.completed).length;
-  const userName = "Eco Warrior";
+  const userName = user?.name || "Guest";
 
   return (
     <ScrollView style={styles.container}>

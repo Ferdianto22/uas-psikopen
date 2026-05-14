@@ -1,5 +1,12 @@
 import { Achievement, UserProfile } from "@/types/profile";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useAuth } from "./AuthContext";
 
 interface ProfileContextType {
   profile: UserProfile;
@@ -8,29 +15,6 @@ interface ProfileContextType {
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
-
-const initialProfile: UserProfile = {
-  id: "user1",
-  name: "Eco Warrior",
-  email: "eco.warrior@ecoconnect.com",
-  avatar: "https://i.pravatar.cc/150?img=10",
-  level: 4,
-  currentPoints: 245,
-  pointsToNextLevel: 255,
-  totalPoints: 1245,
-  joinDate: new Date("2024-01-15"),
-  bio: "Passionate about sustainability and making a positive impact on our planet 🌍",
-  badges: ["first-task", "week-streak", "recycling-hero"],
-  weeklyActivity: [
-    { day: "Mon", tasksCompleted: 5, pointsEarned: 35 },
-    { day: "Tue", tasksCompleted: 6, pointsEarned: 42 },
-    { day: "Wed", tasksCompleted: 4, pointsEarned: 28 },
-    { day: "Thu", tasksCompleted: 7, pointsEarned: 50 },
-    { day: "Fri", tasksCompleted: 5, pointsEarned: 38 },
-    { day: "Sat", tasksCompleted: 6, pointsEarned: 45 },
-    { day: "Sun", tasksCompleted: 4, pointsEarned: 32 },
-  ],
-};
 
 const initialAchievements: Achievement[] = [
   {
@@ -101,8 +85,59 @@ const initialAchievements: Achievement[] = [
 ];
 
 export const ProfileProvider = ({ children }: { children: ReactNode }) => {
-  const [profile, setProfile] = useState<UserProfile>(initialProfile);
+  const { user } = useAuth();
+
+  // Create profile from authenticated user data
+  const createProfileFromUser = (): UserProfile => {
+    if (user) {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        level: 4,
+        currentPoints: 245,
+        pointsToNextLevel: 255,
+        totalPoints: 1245,
+        joinDate: new Date(),
+        bio: "Passionate about sustainability and making a positive impact on our planet 🌍",
+        badges: ["first-task", "week-streak", "recycling-hero"],
+        weeklyActivity: [
+          { day: "Mon", tasksCompleted: 5, pointsEarned: 35 },
+          { day: "Tue", tasksCompleted: 6, pointsEarned: 42 },
+          { day: "Wed", tasksCompleted: 4, pointsEarned: 28 },
+          { day: "Thu", tasksCompleted: 7, pointsEarned: 50 },
+          { day: "Fri", tasksCompleted: 5, pointsEarned: 38 },
+          { day: "Sat", tasksCompleted: 6, pointsEarned: 45 },
+          { day: "Sun", tasksCompleted: 4, pointsEarned: 32 },
+        ],
+      };
+    }
+
+    // Default profile if no user is logged in
+    return {
+      id: "guest",
+      name: "Guest User",
+      email: "guest@ecoconnect.com",
+      avatar: "https://i.pravatar.cc/150?img=10",
+      level: 1,
+      currentPoints: 0,
+      pointsToNextLevel: 100,
+      totalPoints: 0,
+      joinDate: new Date(),
+      bio: "New to EcoConnect",
+      badges: [],
+      weeklyActivity: [],
+    };
+  };
+
+  const [profile, setProfile] = useState<UserProfile>(createProfileFromUser());
   const [achievements] = useState<Achievement[]>(initialAchievements);
+
+  // Update profile when user changes (login/logout)
+  useEffect(() => {
+    setProfile(createProfileFromUser());
+  }, [user]);
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...updates }));

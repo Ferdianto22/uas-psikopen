@@ -1,13 +1,18 @@
 import { AchievementBadge } from "@/components/profile/AchievementBadge";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { WeeklyActivityChart } from "@/components/profile/WeeklyActivityChart";
+import { EcoTheme } from "@/constants/theme";
+import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/contexts/ProfileContext";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { profile, achievements, updateProfile } = useProfile();
+  const { logout } = useAuth();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editedName, setEditedName] = useState(profile.name);
   const [editedBio, setEditedBio] = useState(profile.bio);
@@ -15,6 +20,30 @@ export default function ProfileScreen() {
   const handleSaveProfile = () => {
     updateProfile({ name: editedName, bio: editedBio });
     setEditModalVisible(false);
+  };
+
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            console.log("Starting logout process...");
+            await logout();
+            console.log("Logout complete, navigating to login...");
+            // Navigate to login screen after logout
+            setTimeout(() => {
+              router.replace("/login");
+            }, 50);
+          } catch (error) {
+            console.error("Logout error:", error);
+            Alert.alert("Error", "Failed to logout. Please try again.");
+          }
+        },
+      },
+    ]);
   };
 
   const unlockedAchievements = achievements.filter((a) => a.unlocked);
@@ -71,6 +100,19 @@ export default function ProfileScreen() {
           </ScrollView>
         </View>
 
+        {/* Logout Button */}
+        <View style={styles.logoutContainer}>
+          <Button
+            mode="outlined"
+            onPress={handleLogout}
+            textColor={EcoTheme.colors.error}
+            style={styles.logoutButton}
+            icon="logout"
+          >
+            Logout
+          </Button>
+        </View>
+
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
@@ -91,8 +133,8 @@ export default function ProfileScreen() {
             value={editedName}
             onChangeText={setEditedName}
             style={styles.input}
-            outlineColor="#4CAF50"
-            activeOutlineColor="#4CAF50"
+            outlineColor={EcoTheme.colors.primary}
+            activeOutlineColor={EcoTheme.colors.primary}
           />
 
           <TextInput
@@ -103,8 +145,8 @@ export default function ProfileScreen() {
             multiline
             numberOfLines={3}
             style={styles.input}
-            outlineColor="#4CAF50"
-            activeOutlineColor="#4CAF50"
+            outlineColor={EcoTheme.colors.primary}
+            activeOutlineColor={EcoTheme.colors.primary}
           />
 
           <View style={styles.modalActions}>
@@ -112,7 +154,7 @@ export default function ProfileScreen() {
             <Button
               mode="contained"
               onPress={handleSaveProfile}
-              buttonColor="#4CAF50"
+              buttonColor={EcoTheme.colors.primary}
             >
               Save
             </Button>
@@ -126,7 +168,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: EcoTheme.colors.background,
   },
   section: {
     marginTop: 8,
@@ -146,11 +188,19 @@ const styles = StyleSheet.create({
   badgeScroll: {
     paddingLeft: 8,
   },
+  logoutContainer: {
+    marginHorizontal: 16,
+    marginTop: 24,
+  },
+  logoutButton: {
+    borderColor: EcoTheme.colors.error,
+    borderWidth: 2,
+  },
   bottomSpacing: {
     height: 32,
   },
   modal: {
-    backgroundColor: "#FFF",
+    backgroundColor: EcoTheme.colors.surface,
     padding: 24,
     margin: 20,
     borderRadius: 16,
